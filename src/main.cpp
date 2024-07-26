@@ -1,5 +1,8 @@
 #include "readParseData.h"
 #include "characterize2DSurface.h"
+#include <iostream>
+#include <iomanip>
+
 
 
 
@@ -27,11 +30,14 @@ int main() {
 
     std::cout << "\nFitting doubly curved shell (elliptic paraboloid):" << std::endl;
     Eigen::VectorXd doublyCurvedCoeffs = analyzer.fitDoublyCurvedShell();
-    std::cout << "Shell coefficients: " << doublyCurvedCoeffs.transpose() << std::endl;
+    std::cout << "Shell equation: z = " << doublyCurvedCoeffs(0) << " + " << doublyCurvedCoeffs(1) << " * x + "
+		<< doublyCurvedCoeffs(2) << " * y + " << doublyCurvedCoeffs(3) << " * x^2 + " << doublyCurvedCoeffs(4) << " * x * y + "
+		<< doublyCurvedCoeffs(5) << " * y^2 " << std::endl;
 
     std::cout << "\nFitting singly curved shell (cylindrical paraboloid):" << std::endl;
     Eigen::VectorXd singlyCurvedCoeffs = analyzer.fitCylindricalParaboloid();
-    std::cout << "Shell coefficients: " << singlyCurvedCoeffs.transpose() << std::endl;
+    std::cout << "Shell equation: z = " << singlyCurvedCoeffs(0) << " * (x - " << singlyCurvedCoeffs(1) << ")^2 + "
+		<< singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
 
     analyzer.calculateCoordinateRanges();
     analyzer.printCoordinateRanges();
@@ -60,11 +66,14 @@ int main() {
     Characterize2DSurface characterizer(x_range, y_range, num_x, num_y);
 
     // Quadratic surface: Z = c + a1*X + a2*Y + a3*X^2 + a4*X*Y + a5*Y^2
-    Characterize2DSurface::QuadraticSurface surface1(64.49757509292367, -26.730064479096814, 0.02179036522711368,
-        2.8019565720091357, 0.0014880729562687031, 1.283908862065956);
+    Characterize2DSurface::QuadraticSurface surface1(
+        doublyCurvedCoeffs(0), doublyCurvedCoeffs(1), doublyCurvedCoeffs(2),
+        doublyCurvedCoeffs(3), doublyCurvedCoeffs(4), doublyCurvedCoeffs(5));
 
-    // Singly curved shell: Z = a*(X - b)^2 + c
-    Characterize2DSurface::SinglyCurvedShell surface2(1.051454, 4.790226, 0.880074);
+    // Singly curved shell: Z = c1*(X - c2)^2 + c3*Y + c4
+    Characterize2DSurface::SinglyCurvedShell surface2(
+        singlyCurvedCoeffs(0), singlyCurvedCoeffs(1), 
+        singlyCurvedCoeffs(2), singlyCurvedCoeffs(3));
 
     auto props1 = characterizer.characterize(surface1);
     auto props2 = characterizer.characterize(surface2);

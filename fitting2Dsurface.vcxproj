@@ -19,7 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Characterize2DSurface.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\ReadParseData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Characterize2DSurface.h" />
