@@ -4,6 +4,9 @@
 #include <map>
 #include <Eigen/Dense>
 
+
+
+
 Eigen::VectorXd FittingAlgorithms::fitDoublyCurvedShell() const {
     std::vector<Vector3D> points;
     std::map<int, Vector3D> gridData = readParseData.getGridData();
@@ -25,7 +28,7 @@ Eigen::VectorXd FittingAlgorithms::fitDoublyCurvedShell() const {
     return A.colPivHouseholderQr().solve(z);
 }
 
-Eigen::VectorXd FittingAlgorithms::fitCylindricalParaboloid() const {
+Eigen::VectorXd FittingAlgorithms::fitSinglyCurvedShell(Axis axis) const {
     std::vector<Vector3D> points;
     std::map<int, Vector3D> gridData = readParseData.getGridData();
     for (const auto& point : gridData) {
@@ -36,10 +39,15 @@ Eigen::VectorXd FittingAlgorithms::fitCylindricalParaboloid() const {
     Eigen::MatrixXd A(n, 4);
     Eigen::VectorXd z(n);
 
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
         double x = points[i].x;
         double y = points[i].y;
-        A.row(i) << x * x, x, y, 1;
+        if (axis == Axis::X) {
+            A.row(i) << x * x, x, y, 1;
+        }
+        else {
+            A.row(i) << y * y, y, x, 1;
+        }
         z(i) = points[i].z;
     }
 

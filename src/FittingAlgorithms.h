@@ -4,6 +4,11 @@
 #include <Eigen/Dense>
 #include "ReadParseData.h"
 
+enum class Axis {
+	X,
+	Y
+};
+
 class FittingAlgorithms {
 public:
 
@@ -30,7 +35,7 @@ public:
 	/// We can solve this using simple linear least squares.
 	/// </summary>
 	/// <returns></returns>
-	Eigen::VectorXd fitCylindricalParaboloid() const;
+	Eigen::VectorXd fitSinglyCurvedShell(Axis axis) const;
 
 	/// <summary>
 	/// A flat panel can be described by a plane equation of the form:
