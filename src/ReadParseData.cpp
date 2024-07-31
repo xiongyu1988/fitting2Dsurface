@@ -14,8 +14,17 @@ Vector3D Vector3D::operator-(const Vector3D& other) const {
     return Vector3D(x - other.x, y - other.y, z - other.z);
 }
 
+std::string trim(const std::string& str) {
+    auto start = str.find_first_not_of(" ");
+    auto end = str.find_last_not_of(" ");
+    if (start == std::string::npos || end == std::string::npos) {
+        return "";
+    }
+    return str.substr(start, end - start + 1);
+}
+
 void ReadParseData::parseGridLine(const std::string& line) {
-    if (line.substr(0, 4) == "GRID") {
+    if (trim(line.substr(0, 8)) == "GRID") {
         int nodeId = std::stoi(line.substr(8, 8));
         double x = std::stod(line.substr(24, 8));
         double y = std::stod(line.substr(32, 8));
@@ -25,7 +34,7 @@ void ReadParseData::parseGridLine(const std::string& line) {
 }
 
 void ReadParseData::parseMeshLine(const std::string& line) {
-    if (line.substr(0, 6) == "CTRIA3") {
+    if (trim(line.substr(0, 8)) == "CTRIA3") {
         std::istringstream lineStream(line);
         std::string dummy;
         int elementId, node1, node2, node3;
