@@ -6,6 +6,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <limits>
+#include <regex>
 
 Vector3D::Vector3D() : x(0), y(0), z(0) {}
 Vector3D::Vector3D(double x, double y, double z) : x(x), y(y), z(z) {}
@@ -15,20 +16,36 @@ Vector3D Vector3D::operator-(const Vector3D& other) const {
 }
 
 std::string trim(const std::string& str) {
-    auto start = str.find_first_not_of(" ");
-    auto end = str.find_last_not_of(" ");
-    if (start == std::string::npos || end == std::string::npos) {
-        return "";
+    size_t start = str.find_first_not_of(" \t");
+    size_t end = str.find_last_not_of(" \t");
+    return (start == std::string::npos || end == std::string::npos) ? "" : str.substr(start, end - start + 1);
+}
+
+std::string fixScientificNotation(const std::string& str) {
+    static const std::regex sci_notation_pattern(R"(([-+]?\d*\.?\d+)([-+]\d+))");
+    std::smatch match;
+    std::string result = str;
+    if (std::regex_search(str, match, sci_notation_pattern)) {
+        result = match[1].str() + "e" + match[2].str();
     }
-    return str.substr(start, end - start + 1);
+    return result;
 }
 
 void ReadParseData::parseGridLine(const std::string& line) {
-    if (trim(line.substr(0, 8)) == "GRID") {
-        int nodeId = std::stoi(line.substr(8, 8));
-        double x = std::stod(line.substr(24, 8));
-        double y = std::stod(line.substr(32, 8));
-        double z = std::stod(line.substr(40, 8));
+    if (trim(line.substr(0, 4)) == "GRID") {
+        int nodeId = std::stoi(trim(line.substr(8, 8)));
+        std::string xStr = trim(line.substr(24, 8));
+        std::string yStr = trim(line.substr(32, 8));
+        std::string zStr = trim(line.substr(40, 8));
+
+        xStr = fixScientificNotation(xStr);
+        yStr = fixScientificNotation(yStr);
+        zStr = fixScientificNotation(zStr);
+
+        double x = std::stod(xStr);
+        double y = std::stod(yStr);
+        double z = std::stod(zStr);
+
         gridData[nodeId] = Vector3D(x, y, z);
     }
 }
