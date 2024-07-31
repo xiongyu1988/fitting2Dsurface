@@ -8,8 +8,10 @@ class Characterize2DSurface {
 public:
     struct SurfaceProperties {
         double area;
-        double avg_R;
-        double span_Theta;
+        double avg_R1;
+        double avg_R2;
+        double span_Theta1;
+        double span_Theta2;
     };
 
     class Surface {
@@ -41,9 +43,10 @@ public:
     class SinglyCurvedShell : public Surface {
     private:
         double c1, c2, c3, c4;
+        bool rotate_along_x;
 
     public:
-        SinglyCurvedShell(double c1, double c2, double c3, double c4);
+        SinglyCurvedShell(double c1, double c2, double c3, double c4, bool rotate_along_x);
 
         double Z(double X, double Y) const override;
         double Zx(double X, double Y) const override;

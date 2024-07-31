@@ -11,7 +11,7 @@ int main() {
     ReadParseData readParseData;
 
     try {
-        readParseData.readFromFile("data/openCylinder.fem");
+        readParseData.readFromFile("data/testGeo.fem");
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
@@ -40,6 +40,11 @@ int main() {
     Eigen::VectorXd singlyCurvedCoeffs = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
     std::cout << "Shell equation: z = " << singlyCurvedCoeffs(0) << " * (x - " << singlyCurvedCoeffs(1) << ")^2 + "
         << singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
+
+    std::cout << "\nFitting closed-form singly curved shell (cylinder):" << std::endl;
+    Eigen::VectorXd closedSinglyCurvedCoeffs = fittingAlgorithms.fitCloseSinglyCurvedShell(Axis::Y);
+    std::cout << "Cylinder equation: (x - " << closedSinglyCurvedCoeffs(0) << ")^2 + (y - "
+        << closedSinglyCurvedCoeffs(1) << ")^2 = " << closedSinglyCurvedCoeffs(2) << "^2" << std::endl;
 
     std::cout << "\nFitting flat panel surface:" << std::endl;
     Eigen::VectorXd flatPanelCoeffs = fittingAlgorithms.fitFlatPanel();
@@ -72,19 +77,20 @@ int main() {
 
     Characterize2DSurface characterizer(x_range, y_range, num_x, num_y);
 
-    // Quadratic surface: Z = c + a1*X + a2*Y + a3*X^2 + a4*X*Y + a5*Y^2
+    // Create surfaces
     Characterize2DSurface::QuadraticSurface surface1(
         doublyCurvedCoeffs(0), doublyCurvedCoeffs(1), doublyCurvedCoeffs(2),
         doublyCurvedCoeffs(3), doublyCurvedCoeffs(4), doublyCurvedCoeffs(5));
 
-    // Singly curved shell: Z = c1*(X - c2)^2 + c3*Y + c4
     Characterize2DSurface::SinglyCurvedShell surface2(
-        singlyCurvedCoeffs(0), singlyCurvedCoeffs(1), 
-        singlyCurvedCoeffs(2), singlyCurvedCoeffs(3));
+        singlyCurvedCoeffs(0), singlyCurvedCoeffs(1),
+        singlyCurvedCoeffs(2), singlyCurvedCoeffs(3), true);
 
+    // Characterize the surfaces
     auto props1 = characterizer.characterize(surface1);
     auto props2 = characterizer.characterize(surface2);
 
+    // Print results
     std::cout << "Quadratic Surface properties:" << std::endl;
     Characterize2DSurface::print_properties(props1);
 
