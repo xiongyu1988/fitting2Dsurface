@@ -20,11 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Characterize2DSurface.cpp" />
+    <ClCompile Include="src\FittingAlgorithms.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ReadParseData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Characterize2DSurface.h" />
+    <ClInclude Include="src\FittingAlgorithms.h" />
     <ClInclude Include="src\ReadParseData.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
