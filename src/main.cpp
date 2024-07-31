@@ -41,6 +41,11 @@ int main() {
     std::cout << "Shell equation: z = " << singlyCurvedCoeffs(0) << " * (x - " << singlyCurvedCoeffs(1) << ")^2 + "
         << singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
 
+    std::cout << "\nFitting flat panel surface:" << std::endl;
+    Eigen::VectorXd flatPanelCoeffs = fittingAlgorithms.fitFlatPanel();
+    std::cout << "Panel equation: z = " << flatPanelCoeffs(0) << " + " << flatPanelCoeffs(1) << " * x + "
+        << flatPanelCoeffs(2) << " * y " << std::endl;
+
     readParseData.calculateCoordinateRanges();
     readParseData.printCoordinateRanges();
 

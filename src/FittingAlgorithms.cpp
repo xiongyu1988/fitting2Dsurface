@@ -56,3 +56,24 @@ Eigen::VectorXd FittingAlgorithms::fitCylindricalParaboloid() const {
 
     return Eigen::Vector4d(a, b, c, d);
 }
+
+Eigen::VectorXd FittingAlgorithms::fitFlatPanel() const {
+    std::vector<Vector3D> points;
+    std::map<int, Vector3D> gridData = readParseData.getGridData();
+    for (const auto& point : gridData) {
+        points.push_back(point.second);
+    }
+
+    size_t n = points.size();
+    Eigen::MatrixXd A(n, 3);
+    Eigen::VectorXd z(n);
+
+    for (int i = 0; i < n; ++i) {
+        double x = points[i].x;
+        double y = points[i].y;
+        A.row(i) << 1, x, y;
+        z(i) = points[i].z;
+    }
+
+    return A.colPivHouseholderQr().solve(z);
+}

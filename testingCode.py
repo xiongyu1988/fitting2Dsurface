@@ -3,32 +3,35 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 class Vector3D:
-    def __init__(self, x, y, z):
+    def __init__(self, x=0.0, y=0.0, z=0.0):
         self.x = x
         self.y = y
         self.z = z
 
+    def __sub__(self, other):
+        return Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
+
 class ReadParseData:
     def __init__(self):
-        self.grid_data = {}
-        self.mesh_elements = {}
+        self.gridData = {}
+        self.meshElements = {}
 
     def parse_grid_line(self, line):
         if line.startswith("GRID"):
-            node_id = int(line[8:16].strip())
+            nodeId = int(line[8:16].strip())
             x = float(line[24:32].strip())
             y = float(line[32:40].strip())
             z = float(line[40:48].strip())
-            self.grid_data[node_id] = Vector3D(x, y, z)
+            self.gridData[nodeId] = Vector3D(x, y, z)
 
     def parse_mesh_line(self, line):
         if line.startswith("CTRIA3"):
             parts = line.split()
-            element_id = int(parts[1])
+            elementId = int(parts[1])
             node1 = int(parts[3])
             node2 = int(parts[4])
             node3 = int(parts[5])
-            self.mesh_elements[element_id] = [node1, node2, node3]
+            self.meshElements[elementId] = [node1, node2, node3]
 
     def read_from_file(self, filename):
         with open(filename, 'r') as file:
@@ -36,74 +39,86 @@ class ReadParseData:
                 self.parse_grid_line(line)
                 self.parse_mesh_line(line)
 
-    def plot_geometry(self, ax):
-        # Plot nodes
-        x = [node.x for node in self.grid_data.values()]
-        y = [node.y for node in self.grid_data.values()]
-        z = [node.z for node in self.grid_data.values()]
-        ax.scatter(x, y, z, c='b', marker='o', s=10, label='FEM Nodes')
+    def calculate_surface_area(self):
+        total_area = 0.0
+        for element, nodes in self.meshElements.items():
+            if len(nodes) == 3:
+                p1 = self.gridData[nodes[0]]
+                p2 = self.gridData[nodes[1]]
+                p3 = self.gridData[nodes[2]]
+                v1 = p2 - p1
+                v2 = p3 - p1
+                cross_product = np.cross([v1.x, v1.y, v1.z], [v2.x, v2.y, v2.z])
+                area = 0.5 * np.linalg.norm(cross_product)
+                total_area += area
+        return total_area
 
-        # Plot mesh elements
-        for element in self.mesh_elements.values():
-            for i in range(3):
-                node1 = self.grid_data[element[i]]
-                node2 = self.grid_data[element[(i+1)%3]]
-                ax.plot([node1.x, node2.x], [node1.y, node2.y], [node1.z, node2.z], 'r-', linewidth=0.5)
+    def plot_mesh(self, ax):
+        for element, nodes in self.meshElements.items():
+            x = [self.gridData[node].x for node in nodes]
+            y = [self.gridData[node].y for node in nodes]
+            z = [self.gridData[node].z for node in nodes]
+            x.append(x[0])  # Close the loop
+            y.append(y[0])
+            z.append(z[0])
+            ax.plot(x, y, z, color='b')
 
-    def get_coordinate_ranges(self):
-        x = [node.x for node in self.grid_data.values()]
-        y = [node.y for node in self.grid_data.values()]
-        z = [node.z for node in self.grid_data.values()]
-        return (min(x), max(x)), (min(y), max(y)), (min(z), max(z))
+        # Plot nodal points
+        x = [point.x for point in self.gridData.values()]
+        y = [point.y for point in self.gridData.values()]
+        z = [point.z for point in self.gridData.values()]
+        ax.scatter(x, y, z, color='r', s=10)  # Nodal points in red
 
-# Define the equation parameters
-h = 4.725783
-k = -0.011001
-a = 0.677848
-b = 1.065240
-z0 = 0.796295
+# Function to plot doubly curved shell
+def plot_doubly_curved_shell(ax, coeffs, x_range, y_range):
+    x = np.linspace(x_range[0], x_range[1], 100)
+    y = np.linspace(y_range[0], y_range[1], 100)
+    X, Y = np.meshgrid(x, y)
+    Z = (coeffs[0] + coeffs[1] * X + coeffs[2] * Y +
+         coeffs[3] * X**2 + coeffs[4] * X * Y + coeffs[5] * Y**2)
+    ax.plot_surface(X, Y, Z, color='r', alpha=0.6, edgecolor='none')
 
-# Set up the plot
-fig = plt.figure(figsize=(12, 10))
-ax = fig.add_subplot(111, projection='3d')
+# Function to plot singly curved shell
+def plot_singly_curved_shell(ax, coeffs, x_range, y_range):
+    x = np.linspace(x_range[0], x_range[1], 100)
+    y = np.linspace(y_range[0], y_range[1], 100)
+    X, Y = np.meshgrid(x, y)
+    Z = coeffs[0] * (X - coeffs[1])**2 + coeffs[2] * Y + coeffs[3]
+    ax.plot_surface(X, Y, Z, color='g', alpha=0.6, edgecolor='none')
 
-# Read and plot FEM geometry
-analyzer = ReadParseData()
-analyzer.read_from_file("data/cylinder.fem")
-analyzer.plot_geometry(ax)
+# Function to plot flat panel surface
+def plot_flat_panel(ax, coeffs, x_range, y_range):
+    x = np.linspace(x_range[0], x_range[1], 100)
+    y = np.linspace(y_range[0], y_range[1], 100)
+    X, Y = np.meshgrid(x, y)
+    Z = coeffs[0] + coeffs[1] * X + coeffs[2] * Y
+    ax.plot_surface(X, Y, Z, color='y', alpha=0.6, edgecolor='none')
 
-# Get coordinate ranges from FEM data
-(x_min, x_max), (y_min, y_max), (z_min, z_max) = analyzer.get_coordinate_ranges()
+# Usage
+if __name__ == "__main__":
+    read_parse_data = ReadParseData()
+    read_parse_data.read_from_file('data/testGeo.fem')
+    surface_area = read_parse_data.calculate_surface_area()
+    print(f"Total surface area: {surface_area:.6f}")
 
-# Define the coordinate ranges for the elliptic paraboloid
-x_range = np.linspace(x_min, x_max, 100)
-y_range = np.linspace(y_min, y_max, 100)
-x, y = np.meshgrid(x_range, y_range)
+    # Coefficients and ranges for the surfaces (example values, replace with actual values)
+    #doubly_curved_coeffs = [60.474667 , -25.030457, -0.000741, 2.622955, 0.006062, 1.198502]
+    doubly_curved_coeffs = [4.254311 , -1.281356, -0.374673, 0.121153, 0.082139, 0.087465]
 
-# Calculate z based on the elliptic paraboloid equation
-z = ((x - h)**2 / a**2) + ((y - k)**2 / b**2) + z0
+    singly_curved_coeffs = [0.118743, -1.252326, 0.014910, 4.176812]
+    flat_panel_coeffs = [1.524741, -0.129304, 0.015091]
+    x_range = [4.470440, 4.996350]
+    y_range = [-0.372765, 0.377163]
 
-# Plot the elliptic paraboloid surface
-surf = ax.plot_surface(x, y, z, cmap='viridis', alpha=0.7, label='Fitted Surface')
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
 
-# Set the coordinate ranges
-ax.set_xlim(x_min, x_max)
-ax.set_ylim(y_min, y_max)
-ax.set_zlim(z_min, z_max)
+    read_parse_data.plot_mesh(ax)
+    #plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
+    plot_singly_curved_shell(ax, singly_curved_coeffs, x_range, y_range)
+    #plot_flat_panel(ax, flat_panel_coeffs, x_range, y_range)
 
-# Label the axes
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-
-# Add a title
-ax.set_title('FEM Geometry and Fitted Elliptic Paraboloid')
-
-# Add a color bar
-fig.colorbar(surf, ax=ax, shrink=0.5, aspect=5)
-
-# Add a legend
-ax.legend()
-
-# Show the plot
-plt.show()
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
