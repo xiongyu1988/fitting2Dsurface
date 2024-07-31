@@ -1,10 +1,7 @@
-#include "readParseData.h"
+#include "ReadParseData.h"
 #include "characterize2DSurface.h"
 #include <iostream>
 #include <iomanip>
-
-
-
 
 int main() {
 
@@ -12,7 +9,7 @@ int main() {
     ReadParseData analyzer;
 
     try {
-        analyzer.readFromFile("data/geo1.fem");
+        analyzer.readFromFile("data/testGeo.fem");
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
@@ -37,7 +34,7 @@ int main() {
     std::cout << "\nFitting singly curved shell (cylindrical paraboloid):" << std::endl;
     Eigen::VectorXd singlyCurvedCoeffs = analyzer.fitCylindricalParaboloid();
     std::cout << "Shell equation: z = " << singlyCurvedCoeffs(0) << " * (x - " << singlyCurvedCoeffs(1) << ")^2 + "
-		<< singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
+        << singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
 
     analyzer.calculateCoordinateRanges();
     analyzer.printCoordinateRanges();
