@@ -37,7 +37,7 @@ int main() {
 		<< doublyCurvedCoeffs(5) << " * y^2 " << std::endl;
 
     std::cout << "\nFitting singly curved shell (cylindrical paraboloid):" << std::endl;
-    Eigen::VectorXd singlyCurvedCoeffs = fittingAlgorithms.fitCylindricalParaboloid();
+    Eigen::VectorXd singlyCurvedCoeffs = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
     std::cout << "Shell equation: z = " << singlyCurvedCoeffs(0) << " * (x - " << singlyCurvedCoeffs(1) << ")^2 + "
         << singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
 

@@ -21,7 +21,11 @@ class ReadParseData:
             nodeId = int(line[8:16].strip())
             x = float(line[24:32].strip())
             y = float(line[32:40].strip())
-            z = float(line[40:48].strip())
+            # Correctly interpret scientific notation by inserting 'e' where necessary
+            z_str = line[40:48].strip()
+            if 'e' not in z_str and ('+' in z_str or '-' in z_str[1:]):
+                z_str = z_str[:-3] + 'e' + z_str[-3:]
+            z = float(z_str)
             self.gridData[nodeId] = Vector3D(x, y, z)
 
     def parse_mesh_line(self, line):
@@ -34,10 +38,15 @@ class ReadParseData:
             self.meshElements[elementId] = [node1, node2, node3]
 
     def read_from_file(self, filename):
-        with open(filename, 'r') as file:
-            for line in file:
-                self.parse_grid_line(line)
-                self.parse_mesh_line(line)
+        try:
+            with open(filename, 'r') as file:
+                for line in file:
+                    self.parse_grid_line(line)
+                    self.parse_mesh_line(line)
+        except FileNotFoundError:
+            print(f"Error: File '{filename}' not found.")
+        except Exception as e:
+            print(f"Error: {e}")
 
     def calculate_surface_area(self):
         total_area = 0.0
@@ -69,7 +78,6 @@ class ReadParseData:
         z = [point.z for point in self.gridData.values()]
         ax.scatter(x, y, z, color='r', s=10)  # Nodal points in red
 
-# Function to plot doubly curved shell
 def plot_doubly_curved_shell(ax, coeffs, x_range, y_range):
     x = np.linspace(x_range[0], x_range[1], 100)
     y = np.linspace(y_range[0], y_range[1], 100)
@@ -78,15 +86,13 @@ def plot_doubly_curved_shell(ax, coeffs, x_range, y_range):
          coeffs[3] * X**2 + coeffs[4] * X * Y + coeffs[5] * Y**2)
     ax.plot_surface(X, Y, Z, color='r', alpha=0.6, edgecolor='none')
 
-# Function to plot singly curved shell
 def plot_singly_curved_shell(ax, coeffs, x_range, y_range):
     x = np.linspace(x_range[0], x_range[1], 100)
     y = np.linspace(y_range[0], y_range[1], 100)
     X, Y = np.meshgrid(x, y)
-    Z = coeffs[0] * (X - coeffs[1])**2 + coeffs[2] * Y + coeffs[3]
+    Z = coeffs[0] * (Y - coeffs[1])**2 + coeffs[2] * X + coeffs[3]
     ax.plot_surface(X, Y, Z, color='g', alpha=0.6, edgecolor='none')
 
-# Function to plot flat panel surface
 def plot_flat_panel(ax, coeffs, x_range, y_range):
     x = np.linspace(x_range[0], x_range[1], 100)
     y = np.linspace(y_range[0], y_range[1], 100)
@@ -94,26 +100,27 @@ def plot_flat_panel(ax, coeffs, x_range, y_range):
     Z = coeffs[0] + coeffs[1] * X + coeffs[2] * Y
     ax.plot_surface(X, Y, Z, color='y', alpha=0.6, edgecolor='none')
 
-# Usage
 if __name__ == "__main__":
+    filename = 'data/openCylinder.fem'  # Manually specify the filename here
+
     read_parse_data = ReadParseData()
-    read_parse_data.read_from_file('data/testGeo.fem')
+    read_parse_data.read_from_file(filename)
     surface_area = read_parse_data.calculate_surface_area()
     print(f"Total surface area: {surface_area:.6f}")
 
     # Coefficients and ranges for the surfaces (example values, replace with actual values)
-    #doubly_curved_coeffs = [60.474667 , -25.030457, -0.000741, 2.622955, 0.006062, 1.198502]
-    doubly_curved_coeffs = [4.254311 , -1.281356, -0.374673, 0.121153, 0.082139, 0.087465]
+    doubly_curved_coeffs = [-11.209817 , -0.000904, -2.865284, 0.000055, 0.000078, -0.093105]
+    singly_curved_coeffs = [-0.093109, -15.383293, -0.001024, 10.832004]
+    flat_panel_coeffs = [5.703799, -0.003804, -0.001578]
 
-    singly_curved_coeffs = [0.118743, -1.252326, 0.014910, 4.176812]
-    flat_panel_coeffs = [1.524741, -0.129304, 0.015091]
-    x_range = [4.470440, 4.996350]
-    y_range = [-0.372765, 0.377163]
+    x_range = [0.0, 20.0]
+    y_range = [-25.3859, -5.38594]
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
     read_parse_data.plot_mesh(ax)
+    # Uncomment the surface you want to plot
     #plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
     plot_singly_curved_shell(ax, singly_curved_coeffs, x_range, y_range)
     #plot_flat_panel(ax, flat_panel_coeffs, x_range, y_range)
