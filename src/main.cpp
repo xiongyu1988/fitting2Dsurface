@@ -11,7 +11,7 @@ int main() {
     ReadParseData readParseData;
 
     try {
-        readParseData.readFromFile("data/testGeo.fem");
+        readParseData.readFromFile("data/openCylinder.fem");
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
