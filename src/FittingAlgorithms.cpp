@@ -3,9 +3,7 @@
 #include <vector>
 #include <map>
 #include <Eigen/Dense>
-
-
-
+#include <stdexcept>
 
 Eigen::VectorXd FittingAlgorithms::fitDoublyCurvedShell() const {
     std::vector<Vector3D> points;
@@ -84,4 +82,43 @@ Eigen::VectorXd FittingAlgorithms::fitFlatPanel() const {
     }
 
     return A.colPivHouseholderQr().solve(z);
+}
+
+Eigen::VectorXd FittingAlgorithms::fitCloseSinglyCurvedShell(Axis axis) const {
+    std::vector<Vector3D> points;
+    std::map<int, Vector3D> gridData = readParseData.getGridData();
+    for (const auto& point : gridData) {
+        points.push_back(point.second);
+    }
+
+    size_t n = points.size();
+    Eigen::MatrixXd A(n, 3);
+    Eigen::VectorXd b(n);
+
+    for (size_t i = 0; i < n; ++i) {
+        double x = points[i].x;
+        double y = points[i].y;
+        if (axis == Axis::X) {
+            double z = points[i].z;
+            A(i, 0) = 1;
+            A(i, 1) = x;
+            A(i, 2) = y;
+            b(i) = -x * x - y * y;
+        }
+        else {
+            double z = points[i].z;
+            A(i, 0) = 1;
+            A(i, 1) = y;
+            A(i, 2) = x;
+            b(i) = -y * y - x * x;
+        }
+    }
+
+    Eigen::VectorXd params = A.colPivHouseholderQr().solve(b);
+
+    double a = -params(1) / 2;
+    double b_center = -params(2) / 2;
+    double R = std::sqrt(a * a + b_center * b_center - params(0));
+
+    return Eigen::Vector3d(a, b_center, R);
 }

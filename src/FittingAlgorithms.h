@@ -44,6 +44,13 @@ public:
 	/// <returns></returns>
 	Eigen::VectorXd fitFlatPanel() const;
 
+	/// <summary>
+	/// The general cylinder equation with the axis aligned with the z-axis
+	/// is given by:
+	/// (x - c1)^2 + (y - c2)^2 = r^2
+	/// </summary>
+	Eigen::VectorXd fitCloseSinglyCurvedShell(Axis axis) const;
+
 private:
 	const ReadParseData& readParseData;
 };
