@@ -82,57 +82,6 @@ double ReadParseData::calculateSurfaceArea() const {
     return totalArea;
 }
 
-Eigen::VectorXd ReadParseData::fitDoublyCurvedShell() const {
-    std::vector<Vector3D> points;
-    for (const auto& point : gridData) {
-        points.push_back(point.second);
-    }
-
-    int n = points.size();
-    Eigen::MatrixXd A(n, 6);
-    Eigen::VectorXd z(n);
-
-    for (int i = 0; i < n; ++i) {
-        double x = points[i].x;
-        double y = points[i].y;
-        A.row(i) << 1, x, y, x* x, x* y, y* y;
-        z(i) = points[i].z;
-    }
-
-    return A.colPivHouseholderQr().solve(z);
-}
-
-Eigen::VectorXd ReadParseData::fitCylindricalParaboloid() const {
-    std::vector<Vector3D> points;
-    for (const auto& point : gridData) {
-        points.push_back(point.second);
-    }
-
-    int n = points.size();
-    Eigen::MatrixXd A(n, 4);
-    Eigen::VectorXd z(n);
-
-    for (int i = 0; i < n; ++i) {
-        double x = points[i].x;
-        double y = points[i].y;
-        A.row(i) << x * x, x, y, 1;
-        z(i) = points[i].z;
-    }
-
-    Eigen::VectorXd params = A.colPivHouseholderQr().solve(z);
-
-    double p = params(0);
-    double q = params(1);
-    double c = params(2);
-    double r = params(3);
-
-    double a = p;
-    double b = -q / (2 * p);
-    double d = r - (q * q) / (4 * p);
-
-    return Eigen::Vector4d(a, b, c, d);
-}
-
 void ReadParseData::calculateCoordinateRanges() {
     if (gridData.empty()) {
         std::cout << "No data available." << std::endl;
@@ -186,3 +135,7 @@ void ReadParseData::printAllMeshElements() const {
         std::cout << std::endl;
     }
 }
+
+std::map<int, Vector3D> ReadParseData::getGridData() const {return gridData;}
+
+std::map<int, std::vector<int>> ReadParseData::getMeshElements() const {return meshElements;}

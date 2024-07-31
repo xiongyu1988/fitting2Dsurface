@@ -1,46 +1,51 @@
 #include "ReadParseData.h"
 #include "characterize2DSurface.h"
+#include "FittingAlgorithms.h"
 #include <iostream>
 #include <iomanip>
+
 
 int main() {
 
     // ReadParseData
-    ReadParseData analyzer;
+    ReadParseData readParseData;
 
     try {
-        analyzer.readFromFile("data/testGeo.fem");
+        readParseData.readFromFile("data/testGeo.fem");
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
 
-    //analyzer.printAllGridData();
-    //analyzer.printAllMeshElements();
+    // FittingAlgorithms
+    FittingAlgorithms fittingAlgorithms(readParseData);
+
+    //readParseData.printAllGridData();
+    //readParseData.printAllMeshElements();
 
     std::cout << "Read and Analyze FEM Data" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
 
-    double meshArea = analyzer.calculateSurfaceArea();
+    double meshArea = readParseData.calculateSurfaceArea();
     std::cout << "\nMesh surface area: " << std::setprecision(6) << std::fixed << meshArea << std::endl;
 
     std::cout << "\nFitting doubly curved shell (elliptic paraboloid):" << std::endl;
-    Eigen::VectorXd doublyCurvedCoeffs = analyzer.fitDoublyCurvedShell();
+    Eigen::VectorXd doublyCurvedCoeffs = fittingAlgorithms.fitDoublyCurvedShell();
     std::cout << "Shell equation: z = " << doublyCurvedCoeffs(0) << " + " << doublyCurvedCoeffs(1) << " * x + "
 		<< doublyCurvedCoeffs(2) << " * y + " << doublyCurvedCoeffs(3) << " * x^2 + " << doublyCurvedCoeffs(4) << " * x * y + "
 		<< doublyCurvedCoeffs(5) << " * y^2 " << std::endl;
 
     std::cout << "\nFitting singly curved shell (cylindrical paraboloid):" << std::endl;
-    Eigen::VectorXd singlyCurvedCoeffs = analyzer.fitCylindricalParaboloid();
+    Eigen::VectorXd singlyCurvedCoeffs = fittingAlgorithms.fitCylindricalParaboloid();
     std::cout << "Shell equation: z = " << singlyCurvedCoeffs(0) << " * (x - " << singlyCurvedCoeffs(1) << ")^2 + "
         << singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
 
-    analyzer.calculateCoordinateRanges();
-    analyzer.printCoordinateRanges();
+    readParseData.calculateCoordinateRanges();
+    readParseData.printCoordinateRanges();
 
     // Access ranges for later use
-    const auto& ranges = analyzer.getCoordinateRanges();
+    const auto& ranges = readParseData.getCoordinateRanges();
     double x_min = ranges.x.min;
     double x_max = ranges.x.max;
     double y_min = ranges.y.min;
