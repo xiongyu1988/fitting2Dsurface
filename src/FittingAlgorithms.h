@@ -26,10 +26,18 @@ public:
 	/// Expand it : z = ax² - 2abx + ab² + c * y + d
 	/// Let p = a, q = -2ab, r = ab² + d
 	/// Now we have : z = px² + qx + c * y + r
-	/// This is now linear in terms of the parameters p, q, c, and r.We can solve this using simple linear least squares.
+	/// This is now linear in terms of the parameters p, q, c, and r.
+	/// We can solve this using simple linear least squares.
 	/// </summary>
 	/// <returns></returns>
 	Eigen::VectorXd fitCylindricalParaboloid() const;
+
+	/// <summary>
+	/// A flat panel can be described by a plane equation of the form:
+	/// z = c1 + c2 * x + c3 * y
+	/// </summary>
+	/// <returns></returns>
+	Eigen::VectorXd fitFlatPanel() const;
 
 private:
 	const ReadParseData& readParseData;
