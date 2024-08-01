@@ -1,4 +1,7 @@
+#define _USE_MATH_DEFINES
+
 #include "ReadParseData.h"
+#include <cmath> 
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -7,6 +10,7 @@
 #include <stdexcept>
 #include <limits>
 #include <regex>
+
 
 Vector3D::Vector3D() : x(0), y(0), z(0) {}
 Vector3D::Vector3D(double x, double y, double z) : x(x), y(y), z(z) {}
@@ -151,6 +155,62 @@ void ReadParseData::printAllMeshElements() const {
         }
         std::cout << std::endl;
     }
+}
+
+void ReadParseData::estimateAndAlignAxis() {
+    if (gridData.empty()) {
+        std::cout << "No data available for axis estimation." << std::endl;
+        return;
+    }
+
+    // Step 1: Compute the centroid
+    Eigen::Vector3d centroid(0, 0, 0);
+    for (const auto& point : gridData) {
+        centroid += Eigen::Vector3d(point.second.x, point.second.y, point.second.z);
+    }
+    centroid /= gridData.size();
+
+    // Step 2: Build the covariance matrix
+    Eigen::Matrix3d covariance = Eigen::Matrix3d::Zero();
+    for (const auto& point : gridData) {
+        Eigen::Vector3d p(point.second.x, point.second.y, point.second.z);
+        Eigen::Vector3d centered = p - centroid;
+        covariance += centered * centered.transpose();
+    }
+    covariance /= gridData.size();
+
+    // Step 3: Compute eigenvectors and eigenvalues
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eigensolver(covariance);
+    Eigen::Vector3d main_axis = eigensolver.eigenvectors().col(2); // The eigenvector with the largest eigenvalue
+
+    // Step 4: Check if alignment is needed
+    Eigen::Vector3d z_axis(0, 0, 1);
+    double angle = std::acos(main_axis.dot(z_axis));
+
+    std::cout << "Estimated main axis: (" << main_axis.x() << ", " << main_axis.y() << ", " << main_axis.z() << ")" << std::endl;
+    std::cout << "Angle with z-axis: " << angle * 180 / M_PI << " degrees" << std::endl;
+
+    // Step 5: Align with z-axis if needed
+    if (std::abs(angle) > 1e-6) { // If angle is not close to 0 or 180 degrees
+        Eigen::Vector3d rotation_axis = main_axis.cross(z_axis).normalized();
+        Eigen::AngleAxisd rotation(angle, rotation_axis);
+        Eigen::Matrix3d rotation_matrix = rotation.toRotationMatrix();
+
+        // Apply rotation to all points
+        for (auto& point : gridData) {
+            Eigen::Vector3d p(point.second.x, point.second.y, point.second.z);
+            p = rotation_matrix * (p - centroid) + centroid;
+            point.second = Vector3D(p.x(), p.y(), p.z());
+        }
+
+        std::cout << "Geometry aligned with z-axis." << std::endl;
+    }
+    else {
+        std::cout << "Geometry is already aligned with z-axis." << std::endl;
+    }
+
+    // Recalculate coordinate ranges after alignment
+    calculateCoordinateRanges();
 }
 
 std::map<int, Vector3D> ReadParseData::getGridData() const {return gridData;}

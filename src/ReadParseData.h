@@ -47,6 +47,7 @@ public:
     void printAllMeshElements() const;
     std::map<int, Vector3D> getGridData() const;
     std::map<int, std::vector<int>> getMeshElements() const;
+    void estimateAndAlignAxis();
 };
 
 #endif // READ_PARSE_DATA_H

@@ -19,13 +19,24 @@ class ReadParseData:
     def parse_grid_line(self, line):
         if line.startswith("GRID"):
             nodeId = int(line[8:16].strip())
-            x = float(line[24:32].strip())
-            y = float(line[32:40].strip())
-            # Correctly interpret scientific notation by inserting 'e' where necessary
-            z_str = line[40:48].strip()
-            if 'e' not in z_str and ('+' in z_str or '-' in z_str[1:]):
-                z_str = z_str[:-3] + 'e' + z_str[-3:]
+            
+            def parse_scientific(s):
+                if 'e' not in s and '-' in s[1:]:
+                    parts = s.rsplit('-', 1)
+                    return f"{parts[0]}e-{parts[1]}"
+                elif 'e' not in s and '+' in s[1:]:
+                    parts = s.rsplit('+', 1)
+                    return f"{parts[0]}e+{parts[1]}"
+                return s
+
+            x_str = parse_scientific(line[24:32].strip())
+            y_str = parse_scientific(line[32:40].strip())
+            z_str = parse_scientific(line[40:48].strip())
+
+            x = float(x_str)
+            y = float(y_str)
             z = float(z_str)
+
             self.gridData[nodeId] = Vector3D(x, y, z)
 
     def parse_mesh_line(self, line):
@@ -101,7 +112,7 @@ def plot_flat_panel(ax, coeffs, x_range, y_range):
     ax.plot_surface(X, Y, Z, color='y', alpha=0.6, edgecolor='none')
 
 if __name__ == "__main__":
-    filename = 'data/openCylinder.fem'  # Manually specify the filename here
+    filename = 'data/closeCylinder.fem'  # Manually specify the filename here
 
     read_parse_data = ReadParseData()
     read_parse_data.read_from_file(filename)
@@ -113,16 +124,16 @@ if __name__ == "__main__":
     singly_curved_coeffs = [-0.093109, -15.383293, -0.001024, 10.832004]
     flat_panel_coeffs = [5.703799, -0.003804, -0.001578]
 
-    x_range = [0.0, 20.0]
-    y_range = [-25.3859, -5.38594]
+    # x_range = [0.0, 20.0]
+    # y_range = [-25.3859, -5.38594]
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
     read_parse_data.plot_mesh(ax)
     # Uncomment the surface you want to plot
-    #plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
-    plot_singly_curved_shell(ax, singly_curved_coeffs, x_range, y_range)
+    # plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
+    #plot_singly_curved_shell(ax, singly_curved_coeffs, x_range, y_range)
     #plot_flat_panel(ax, flat_panel_coeffs, x_range, y_range)
 
     ax.set_xlabel('X')
