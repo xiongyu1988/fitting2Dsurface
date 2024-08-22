@@ -20,8 +20,8 @@ int main() {
     // FittingAlgorithms
     FittingAlgorithms fittingAlgorithms(readParseData);
 
-    readParseData.printAllGridData();
-    readParseData.printAllMeshElements();
+    //readParseData.printAllGridData();
+    //readParseData.printAllMeshElements();
 
     std::cout << "Read and Analyze FEM Data" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
@@ -41,7 +41,7 @@ int main() {
         << singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
 
     std::cout << "\nFitting closed-form singly curved shell (cylinder):" << std::endl;
-    Eigen::VectorXd closedSinglyCurvedCoeffs = fittingAlgorithms.fitCloseSinglyCurvedShell(Axis::Y);
+    Eigen::VectorXd closedSinglyCurvedCoeffs = fittingAlgorithms.fitCloseSinglyCurvedShell(Axis::X);
     std::cout << "Cylinder equation: (x - " << closedSinglyCurvedCoeffs(0) << ")^2 + (y - "
         << closedSinglyCurvedCoeffs(1) << ")^2 = " << closedSinglyCurvedCoeffs(2) << "^2" << std::endl;
 

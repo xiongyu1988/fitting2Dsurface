@@ -90,7 +90,7 @@ def plot_singly_curved_shell(ax, coeffs, x_range, y_range):
     x = np.linspace(x_range[0], x_range[1], 100)
     y = np.linspace(y_range[0], y_range[1], 100)
     X, Y = np.meshgrid(x, y)
-    Z = coeffs[0] * (Y - coeffs[1])**2 + coeffs[2] * X + coeffs[3]
+    Z = coeffs[0] * (X - coeffs[1])**2 + coeffs[2] * Y + coeffs[3]
     ax.plot_surface(X, Y, Z, color='g', alpha=0.6, edgecolor='none')
 
 def plot_flat_panel(ax, coeffs, x_range, y_range):
@@ -109,21 +109,21 @@ if __name__ == "__main__":
     print(f"Total surface area: {surface_area:.6f}")
 
     # Coefficients and ranges for the surfaces (example values, replace with actual values)
-    doubly_curved_coeffs = [-11.209817, -0.000904, -2.865284, 0.000055, 0.000078, -0.093105]
-    singly_curved_coeffs = [-0.093109, -15.383293, -0.001024, 10.832004]
-    flat_panel_coeffs = [5.703799, -0.003804, -0.001578]
+    doubly_curved_coeffs = [60.474667, -25.030457, -0.000741, 2.622955, 0.006062, 1.198502]
+    singly_curved_coeffs = [0.427566, -0.024748, -0.163008, 1.655713]
+    flat_panel_coeffs = [1.524741, -0.129304, 0.015091]
 
-    x_range = [0.0, 20.0]
-    y_range = [-25.3859, -5.38594]
+    x_range = [4.470440, 4.996350]
+    y_range = [-0.372765, 0.377163]
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
     read_parse_data.plot_mesh(ax)
     # Uncomment the surface you want to plot
-    # plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
-    # plot_singly_curved_shell(ax, singly_curved_coeffs, x_range, y_range)
-    # plot_flat_panel(ax, flat_panel_coeffs, x_range, y_range)
+    #plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
+    plot_singly_curved_shell(ax, singly_curved_coeffs, x_range, y_range)
+    #plot_flat_panel(ax, flat_panel_coeffs, x_range, y_range)
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')

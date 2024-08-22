@@ -2,77 +2,48 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-# Define the mesh grid for u and v
-u = np.linspace(-10, 10, 1000)
-v = np.linspace(-20, 20, 1000)
-u, v = np.meshgrid(u, v)
+# Function to plot the elliptic paraboloid with principal curvatures highlighted
+def plot_elliptic_paraboloid_with_curvatures(Rx=5, Ry=3):
+    # Calculate a and b based on the desired radii Rx and Ry
+    a = 1 / (2 * Rx)
+    b = 1 / (2 * Ry)
+    
+    # Generate mesh grid
+    x = np.linspace(-5, 5, 100)
+    y = np.linspace(-5, 5, 100)
+    x, y = np.meshgrid(x, y)
+    z = a * x**2 + b * y**2
 
-R1 = 20  # Known radius of curvature
-R2 = 40  #
+    # Plotting the surface
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(x, y, z, cmap='viridis', edgecolor='none', alpha=0.8)
 
-# Define the parameters a and b
-a = np.sqrt(2*R1)  # a = sqrt(2*R1) where R1 is unknown
-b = np.sqrt(2*R2)  # b = sqrt(2*R2) where R2 is unknown
+    # Highlighting the principal curvatures along the x and y axes
+    x_curve = np.linspace(-5, 5, 100)
+    y_curve = np.zeros_like(x_curve)
+    z_x_curve = a * x_curve**2
+    ax.plot(x_curve, y_curve, z_x_curve, color='red', linewidth=3, label=f'Curvature in X (Rx={Rx})')
 
-# Define the elliptic paraboloid equation
-z = (u**2 / a**2) + (v**2 / b**2)
+    y_curve = np.linspace(-5, 5, 100)
+    x_curve = np.zeros_like(y_curve)
+    z_y_curve = b * y_curve**2
+    ax.plot(x_curve, y_curve, z_y_curve, color='blue', linewidth=3, label=f'Curvature in Y (Ry={Ry})')
 
-# Calculate partial derivatives
-zu = 2 * u / a**2
-zv = 2 * v / b**2
+    # Adding labels and title
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.set_title(f'Elliptic Paraboloid with Rx={Rx}, Ry={Ry}')
 
-# First fundamental form coefficients
-E = 1 + zu**2
-G = 1 + zv**2
+    # Adding legend
+    ax.legend()
 
-# Second derivatives
-zuu = 2 / a**2
-zvv = 2 / b**2
+    # Annotating the radii of curvature
+    ax.text(0, 0, a * (5**2), f'Rx = {Rx}', color='red', fontsize=12)
+    ax.text(0, 0, b * (5**2), f'Ry = {Ry}', color='blue', fontsize=12)
 
-# Normal vector components
-nx = -zu
-ny = -zv
-nz = np.ones_like(z)
-n = np.sqrt(nx**2 + ny**2 + nz**2)
-nx /= n
-ny /= n
-nz /= n
+    plt.show()
 
-# Second fundamental form coefficients
-L = zuu / n
-N = zvv / n
-
-# Principal curvatures
-K1 = L / E
-K2 = N / G
-
-# Radii of curvature
-R1_values = 1 / K1
-R2_values = 1 / K2
-
-# Angles relative to the normal vector
-angles = np.degrees(np.arccos(nz))
-
-# Plotting the surface
-fig = plt.figure(figsize=(10, 8))
-ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(u, v, z, cmap='viridis', edgecolor='none')
-
-# Set plot limits
-ax.set_xlim([-10, 10])
-ax.set_ylim([-20, 20])
-ax.set_zlim([0, max(20, 40)])
-
-# Labels and title
-ax.set_xlabel('X axis')
-ax.set_ylabel('Y axis')
-ax.set_zlabel('Z axis')
-ax.set_title('Elliptic Paraboloid with Calculated Radii of Curvature')
-
-# Show the plot
-plt.show()
-
-# Display results
-print(f'Calculated Mean Radius of Curvature R1: {np.mean(R1_values)}')
-print(f'Calculated Mean Radius of Curvature R2: {np.mean(R2_values)}')
-print(f'Mean Angle Relative to Normal Vector: {np.mean(angles)} degrees')
+# Plot with specific Rx and Ry values
+plot_elliptic_paraboloid_with_curvatures(Rx=5, Ry=3)
