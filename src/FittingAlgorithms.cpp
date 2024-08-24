@@ -46,6 +46,31 @@ Eigen::VectorXd FittingAlgorithms::fitDoublyCurvedShell() const {
     }
 }
 
+Eigen::VectorXd FittingAlgorithms::fitDoublyCurvedShell2() const {
+    std::vector<Vector3D> points;
+    std::map<int, Vector3D> gridData = readParseData.getGridData();
+    for (const auto& point : gridData) {
+        points.push_back(point.second);
+    }
+
+    size_t n = points.size();
+    Eigen::MatrixXd A(n, 4); // 4 coefficients: a, b, c, d
+    Eigen::VectorXd z(n);
+
+    for (size_t i = 0; i < n; ++i) {
+        double x = points[i].x;
+        double y = points[i].y;
+        A.row(i) << x * x, x, y, y* y;
+        z(i) = points[i].z;
+    }
+
+    Eigen::VectorXd params = A.colPivHouseholderQr().solve(z);
+
+    // The output vector contains [a, b, c, d] corresponding to z = a*x^2 + b*x + c*y + d*y^2
+    return params;
+}
+
+
 
 Eigen::VectorXd FittingAlgorithms::fitSinglyCurvedShell(Axis axis) const {
     std::vector<Vector3D> points;

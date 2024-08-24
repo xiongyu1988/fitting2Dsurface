@@ -23,6 +23,20 @@ public:
      */
     Eigen::VectorXd fitDoublyCurvedShell() const;
 
+	/**
+	 * @brief Fits a doubly curved shell (elliptic paraboloid) using a different approach.
+	 * The equation of an elliptic paraboloid is given by:
+	 * z = c1 * x^2 + c2 * x + c3 * y + c4 * y^2
+	 *
+	 * This function uses a simplified approach to transform a non-linear least squares fitting problem
+	 * into a linear one by expanding the equation into:
+	 * z = p * x^2 + q * x + c * y + r * y^2,
+	 * where p and q are the parameters to be solved.
+	 *
+	 * @return Eigen::VectorXd - The coefficients [p, q, c, r] for the fitted surface.
+	 */
+	Eigen::VectorXd fitDoublyCurvedShell2() const;
+
     /**
      * @brief Fits a singly curved shell (cylindrical paraboloid).
      * The equation of a cylindrical paraboloid is given by:

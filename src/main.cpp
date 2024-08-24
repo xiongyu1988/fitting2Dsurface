@@ -10,7 +10,7 @@ int main() {
     ReadParseData readParseData;
 
     try {
-        readParseData.readFromFile("data/testGeo.fem");
+        readParseData.readFromFile("data/doublyCurvedShell_2.fem");
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
@@ -34,6 +34,17 @@ int main() {
     std::cout << "Shell equation: z = " << doublyCurvedCoeffs(0) << " + " << doublyCurvedCoeffs(1) << " * x + "
 		<< doublyCurvedCoeffs(2) << " * y + " << doublyCurvedCoeffs(3) << " * x^2 + " << doublyCurvedCoeffs(4) << " * x * y + "
 		<< doublyCurvedCoeffs(5) << " * y^2 " << std::endl;
+
+	std::cout << "\nFitting doubly curved shell (elliptic paraboloid) using a different approach:" << std::endl;
+    Eigen::VectorXd coefficients = fittingAlgorithms.fitDoublyCurvedShell2();
+    double a = coefficients(0);
+    double b = coefficients(1);
+    double c = coefficients(2);
+    double d = coefficients(3);
+    std::cout << "Fitted equation: z = " << a << " * x^2 + " << b << " * x + " << c << " * y + " << d << " * y^2" << std::endl;
+
+
+
 
     std::cout << "\nFitting singly curved shell (cylindrical paraboloid):" << std::endl;
     Eigen::VectorXd singlyCurvedCoeffs = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
