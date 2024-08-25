@@ -36,7 +36,8 @@ void Characterize2DSurface::computeRadiiAndCurvatureLengths(double x, double y, 
 }
 
 // Function to calculate the central angle
-static double calculateCentralAngle(double curveLength, double radius) {
+// Definition of the static method calculateCentralAngle
+double Characterize2DSurface::calculateCentralAngle(double curveLength, double radius) {
     // Calculate the angle in radians
     double angleInRadians = curveLength / radius;
 
