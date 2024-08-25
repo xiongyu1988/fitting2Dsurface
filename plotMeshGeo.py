@@ -148,7 +148,7 @@ if __name__ == "__main__":
     print(f"Total surface area: {surface_area:.6f}")
 
     # Coefficients and ranges for the surfaces (example values, replace with actual values)
-    doubly_curved_coeffs = [60.474667, -25.030457, -0.000741, 2.622955, 0.006062, 1.198502]
+    doubly_curved_coeffs = [2.642775, -1.885779, -0.000014, 0.379050, 0.000005, -7.376935]
     singly_curved_coeffs = [0.427566, -0.024748, -0.163008, 1.655713]
     flat_panel_coeffs = [1.524741, -0.129304, 0.015091]
 
@@ -165,9 +165,9 @@ if __name__ == "__main__":
     read_parse_data.plot_mesh(ax)
     # Uncomment the surface you want to plot
     #plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
-    #plot_doubly_curved_shell2(ax, doubly_curved_coeffs2, x_range, y_range)
+    plot_doubly_curved_shell2(ax, doubly_curved_coeffs2, x_range, y_range)
     #plot_flat_panel(ax, flat_panel_coeffs, x_range, y_range)
-    plot_singly_curved_shell2(ax, singly_curved_coeffs2, x_range, y_range)
+    #plot_singly_curved_shell2(ax, singly_curved_coeffs2, x_range, y_range)
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
