@@ -121,7 +121,7 @@ void ReadParseData::calculateCoordinateRanges() {
 }
 
 void ReadParseData::printCoordinateRanges() const {
-    std::cout << "\nCoordinate Ranges:" << std::endl;
+    std::cout << "Coordinate Ranges:" << std::endl;
     std::cout << std::fixed << std::setprecision(6);
     std::cout << "x range: [" << ranges.x.min << ", " << ranges.x.max << "]" << std::endl;
     std::cout << "y range: [" << ranges.y.min << ", " << ranges.y.max << "]" << std::endl;
@@ -134,7 +134,8 @@ void ReadParseData::calculateCenterCoordantes() {
     center.centerY = (ranges.y.min + ranges.y.max) / 2.0;
     center.centerZ = (ranges.z.min + ranges.z.max) / 2.0;
 
-    std::cout << "Center Coordinates: ("
+    std::cout << "Center Coordinates:" << std::endl
+        << "("
         << center.centerX << ", "
         << center.centerY << ", "
         << center.centerZ << ")" << std::endl;

@@ -25,10 +25,12 @@ int main() {
 
     std::cout << "Read and Analyze FEM Data" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
-
     double meshArea = readParseData.calculateSurfaceArea();
     std::cout << "\nMesh surface area: " << std::setprecision(6) << std::fixed << meshArea << std::endl;
 
+    std::cout << "\n\n";
+    std::cout << "Fitting Algorithms" << std::endl;
+    std::cout << "--------------------------------------------" << std::endl;
     std::cout << "\nFitting doubly curved shell (elliptic paraboloid):" << std::endl;
     Eigen::VectorXd doublyCurvedCoeffs = fittingAlgorithms.fitDoublyCurvedShell();
     std::cout << "Shell equation: z = " << doublyCurvedCoeffs(0) << " + " << doublyCurvedCoeffs(1) << " * x + "
@@ -37,14 +39,8 @@ int main() {
 
 	std::cout << "\nFitting doubly curved shell (elliptic paraboloid) using a different approach:" << std::endl;
     Eigen::VectorXd coefficients = fittingAlgorithms.fitDoublyCurvedShell2();
-    double a = coefficients(0);
-    double b = coefficients(1);
-    double c = coefficients(2);
-    double d = coefficients(3);
-    std::cout << "Fitted equation: z = " << a << " * x^2 + " << b << " * x + " << c << " * y + " << d << " * y^2" << std::endl;
-
-
-
+    std::cout << "Fitted equation: z = " << coefficients(0) << " * x^2 + " << coefficients(1) 
+              << " * x + " << coefficients(2) << " * y + " << coefficients(3) << " * y^2" << std::endl;
 
     std::cout << "\nFitting singly curved shell (cylindrical paraboloid):" << std::endl;
     Eigen::VectorXd singlyCurvedCoeffs = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
@@ -61,39 +57,32 @@ int main() {
     std::cout << "Panel equation: z = " << flatPanelCoeffs(0) << " + " << flatPanelCoeffs(1) << " * x + "
         << flatPanelCoeffs(2) << " * y " << std::endl;
 
+    std::cout << "\n\n";
+    std::cout << "Coordinate Range and Center" << std::endl;
+    std::cout << "--------------------------------------------" << std::endl;
     readParseData.calculateCoordinateRanges();
     readParseData.printCoordinateRanges();
-
     // Access ranges for later use
     const auto& ranges = readParseData.getCoordinateRanges();
-    double x_min = ranges.x.min;
-    double x_max = ranges.x.max;
-    double y_min = ranges.y.min;
-    double y_max = ranges.y.max;
-    double z_min = ranges.z.min;
-    double z_max = ranges.z.max;
-    // Similarly for y and z
     readParseData.calculateCenterCoordantes();
 
     std::cout << "\n\n";
     std::cout << "Characterize Fitted 2D Surface" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
-
-    Characterize2DSurface surface(a, b, c, d);
-
-
-
+    Characterize2DSurface surface(coefficients(0), coefficients(1), coefficients(2), coefficients(3));
     const auto& center = readParseData.getCenterCoordinates();
-
     double x = center.centerX, y = center.centerY; // The point at which to compute the curvature
     double R1, R2, L1, L2;
-
     surface.computeRadiiAndCurvatureLengths(x, y, R1, R2, L1, L2);
-
     std::cout << "Principal Radius of Curvature R1: " << R1 << std::endl;
     std::cout << "Principal Radius of Curvature R2: " << R2 << std::endl;
     std::cout << "Principal Curvature Length L1: " << L1 << std::endl;
     std::cout << "Principal Curvature Length L2: " << L2 << std::endl;
+	double centerAngle1, centerAngle2;
+	centerAngle1 = Characterize2DSurface::calculateCentralAngle(L1, R1);
+	centerAngle2 = Characterize2DSurface::calculateCentralAngle(L2, R2);
+	std::cout << "Central Angle 1: " << centerAngle1 << std::endl;
+	std::cout << "Central Angle 2: " << centerAngle2 << std::endl;
 
     return 0;
 }
