@@ -79,34 +79,17 @@ int main() {
     std::cout << "Characterize Fitted 2D Surface" << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
 
-    // Characterize2DSurface
-    std::pair<double, double> x_range = { x_min, x_max };
-    std::pair<double, double> y_range = { y_min, y_max };
-    int num_x = 50;
-    int num_y = 50;
+    Characterize2DSurface surface(a, b, c, d);
 
-    Characterize2DSurface characterizer(x_range, y_range, num_x, num_y);
+    double x = 2.0, y = 1.0; // The point at which to compute the curvature
+    double R1, R2, L1, L2;
 
-    // Create surfaces
-    Characterize2DSurface::QuadraticSurface surface1(
-        doublyCurvedCoeffs(0), doublyCurvedCoeffs(1), doublyCurvedCoeffs(2),
-        doublyCurvedCoeffs(3), doublyCurvedCoeffs(4), doublyCurvedCoeffs(5));
+    surface.computeRadiiAndCurvatureLengths(x, y, R1, R2, L1, L2);
 
-    Characterize2DSurface::SinglyCurvedShell surface2(
-        singlyCurvedCoeffs(0), singlyCurvedCoeffs(1),
-        singlyCurvedCoeffs(2), singlyCurvedCoeffs(3), true);
-
-    // Characterize the surfaces
-    auto props1 = characterizer.characterize(surface1);
-    auto props2 = characterizer.characterize(surface2);
-
-    // Print results
-    std::cout << "Quadratic Surface properties:" << std::endl;
-    Characterize2DSurface::print_properties(props1);
-
-    std::cout << "\nSingly Curved Shell properties:" << std::endl;
-    Characterize2DSurface::print_properties(props2);
-
+    std::cout << "Principal Radius of Curvature R1: " << R1 << std::endl;
+    std::cout << "Principal Radius of Curvature R2: " << R2 << std::endl;
+    std::cout << "Principal Curvature Length L1: " << L1 << std::endl;
+    std::cout << "Principal Curvature Length L2: " << L2 << std::endl;
 
     return 0;
 }
