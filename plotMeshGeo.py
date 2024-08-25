@@ -118,6 +118,13 @@ def plot_singly_curved_shell(ax, coeffs, x_range, y_range):
     Z = coeffs[0] * (X - coeffs[1])**2 + coeffs[2] * Y + coeffs[3]
     ax.plot_surface(X, Y, Z, color='g', alpha=0.6, edgecolor='none')
 
+def plot_singly_curved_shell2(ax, coeffs, x_range, y_range):
+    x = np.linspace(x_range[0], x_range[1], 100)
+    y = np.linspace(y_range[0], y_range[1], 100)
+    X, Y = np.meshgrid(x, y)
+    Z =coeffs[0] * Y**2 + coeffs[1] * X 
+    ax.plot_surface(X, Y, Z, color='g', alpha=0.6, edgecolor='none')
+
 def plot_doubly_curved_shell2(ax, coeffs, x_range, y_range):
     x = np.linspace(x_range[0], x_range[1], 100)
     y = np.linspace(y_range[0], y_range[1], 100)
@@ -147,6 +154,7 @@ if __name__ == "__main__":
 
     #doubly_curved_coeffs2 = [-0.072603, 0.531280, 0.020841, 0.401458]
     doubly_curved_coeffs2 = [-0.117619, 0.410272, -0.000002, -7.154899]
+    singly_curved_coeffs2 = [-4.317719, 0.127801]
 
     x_range = [2.093541, 2.527030]
     y_range = [-0.136805, 0.136805]
@@ -157,8 +165,9 @@ if __name__ == "__main__":
     read_parse_data.plot_mesh(ax)
     # Uncomment the surface you want to plot
     #plot_doubly_curved_shell(ax, doubly_curved_coeffs, x_range, y_range)
-    plot_doubly_curved_shell2(ax, doubly_curved_coeffs2, x_range, y_range)
+    #plot_doubly_curved_shell2(ax, doubly_curved_coeffs2, x_range, y_range)
     #plot_flat_panel(ax, flat_panel_coeffs, x_range, y_range)
+    plot_singly_curved_shell2(ax, singly_curved_coeffs2, x_range, y_range)
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')

@@ -42,15 +42,11 @@ int main() {
     std::cout << "Fitted equation: z = " << coefficients(0) << " * x^2 + " << coefficients(1) 
               << " * x + " << coefficients(2) << " * y + " << coefficients(3) << " * y^2" << std::endl;
 
-    std::cout << "\nFitting singly curved shell (cylindrical paraboloid):" << std::endl;
-    Eigen::VectorXd singlyCurvedCoeffs = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
-    std::cout << "Shell equation: z = " << singlyCurvedCoeffs(0) << " * (x - " << singlyCurvedCoeffs(1) << ")^2 + "
-        << singlyCurvedCoeffs(2) << " * y + " << singlyCurvedCoeffs(3) << std::endl;
-
-    std::cout << "\nFitting closed-form singly curved shell (cylinder):" << std::endl;
-    Eigen::VectorXd closedSinglyCurvedCoeffs = fittingAlgorithms.fitCloseSinglyCurvedShell(Axis::X);
-    std::cout << "Cylinder equation: (x - " << closedSinglyCurvedCoeffs(0) << ")^2 + (y - "
-        << closedSinglyCurvedCoeffs(1) << ")^2 = " << closedSinglyCurvedCoeffs(2) << "^2" << std::endl;
+    std::cout << "\nFitting singly curved shell (cylindrical paraboloid) using a different approach:" << std::endl;
+    Eigen::VectorXd coefitSinglyCurvedShell2X = fittingAlgorithms.fitSinglyCurvedShell(Axis::X);
+    std::cout << "Fitted equation along X-axis: z = " << coefitSinglyCurvedShell2X(0) << " * x^2 + " << coefitSinglyCurvedShell2X(1) << " * y" << std::endl;
+    Eigen::VectorXd coefitSinglyCurvedShell2Y = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
+    std::cout << "Fitted equation along Y-axis: z = " << coefitSinglyCurvedShell2Y(0) << " * y^2 + " << coefitSinglyCurvedShell2Y(1) << " * x" << std::endl;
 
     std::cout << "\nFitting flat panel surface:" << std::endl;
     Eigen::VectorXd flatPanelCoeffs = fittingAlgorithms.fitFlatPanel();
