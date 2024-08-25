@@ -73,7 +73,7 @@ int main() {
     double z_min = ranges.z.min;
     double z_max = ranges.z.max;
     // Similarly for y and z
-
+    readParseData.calculateCenterCoordantes();
 
     std::cout << "\n\n";
     std::cout << "Characterize Fitted 2D Surface" << std::endl;
@@ -81,7 +81,11 @@ int main() {
 
     Characterize2DSurface surface(a, b, c, d);
 
-    double x = 2.0, y = 1.0; // The point at which to compute the curvature
+
+
+    const auto& center = readParseData.getCenterCoordinates();
+
+    double x = center.centerX, y = center.centerY; // The point at which to compute the curvature
     double R1, R2, L1, L2;
 
     surface.computeRadiiAndCurvatureLengths(x, y, R1, R2, L1, L2);

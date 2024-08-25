@@ -26,6 +26,12 @@ private:
         double max;
     };
 
+	struct CenterCoordinates {
+		double centerX;
+		double centerY;
+		double centerZ;
+	};
+
     struct CoordinateRanges {
         Range x;
         Range y;
@@ -33,6 +39,7 @@ private:
     };
 
     CoordinateRanges ranges;
+    CenterCoordinates center;
 
     void parseGridLine(const std::string& line);
     void parseMeshLine(const std::string& line);
@@ -42,7 +49,9 @@ public:
     double calculateSurfaceArea() const;
     void calculateCoordinateRanges();
     void printCoordinateRanges() const;
+    void calculateCenterCoordantes();
     const CoordinateRanges& getCoordinateRanges() const;
+	const CenterCoordinates& getCenterCoordinates() const;
     void printAllGridData() const;
     void printAllMeshElements() const;
     std::map<int, Vector3D> getGridData() const;
