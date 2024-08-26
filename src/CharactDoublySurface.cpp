@@ -1,4 +1,4 @@
-#include "Characterize2DSurface.h"
+#include "CharactDoublySurface.h"
 #define _USE_MATH_DEFINES
 #include <math.h> 
 #include <cmath>
@@ -6,36 +6,36 @@
 #include <iomanip>
 
 // Constructor implementation
-Characterize2DSurface::Characterize2DSurface(double c1, double c2, double c3, double c4)
+CharactDoublySurface::CharactDoublySurface(double c1, double c2, double c3, double c4)
     : c1(c1), c2(c2), c3(c3), c4(c4) {}
 
 // Function to calculate z given x and y
-double Characterize2DSurface::z(double x, double y) const {
+double CharactDoublySurface::z(double x, double y) const {
     return c1 * x * x + c2 * x + c3 * y + c4 * y * y;
 }
 
 // Function to calculate dz/dx
-double Characterize2DSurface::dz_dx(double x, double y) const {
+double CharactDoublySurface::dz_dx(double x, double y) const {
     return 2 * c1 * x + c2;
 }
 
 // Function to calculate dz/dy
-double Characterize2DSurface::dz_dy(double x, double y) const {
+double CharactDoublySurface::dz_dy(double x, double y) const {
     return c3 + 2 * c4 * y;
 }
 
 // Integrand function for arc length along x
-double Characterize2DSurface::integrand_x(double x, double y) const {
+double CharactDoublySurface::integrand_x(double x, double y) const {
     return std::sqrt(1 + std::pow(dz_dx(x, y), 2));
 }
 
 // Integrand function for arc length along y
-double Characterize2DSurface::integrand_y(double y, double x) const {
+double CharactDoublySurface::integrand_y(double y, double x) const {
     return std::sqrt(1 + std::pow(dz_dy(x, y), 2));
 }
 
 // Simpson's rule for numerical integration
-double Characterize2DSurface::simpson_integration(double a, double b, double fixed, bool along_x, int n) const {
+double CharactDoublySurface::simpson_integration(double a, double b, double fixed, bool along_x, int n) const {
     double h = (b - a) / n;
     double sum = (along_x ? integrand_x(a, fixed) + integrand_x(b, fixed)
         : integrand_y(a, fixed) + integrand_y(b, fixed));
@@ -52,7 +52,7 @@ double Characterize2DSurface::simpson_integration(double a, double b, double fix
 }
 
 // Function to calculate arc length
-void Characterize2DSurface::calculate_arc_length(double start, double end, double fixed, bool along_x, double& arc_length, int num_intervals) const {
+void CharactDoublySurface::calculate_arc_length(double start, double end, double fixed, bool along_x, double& arc_length, int num_intervals) const {
     arc_length = simpson_integration(start, end, fixed, along_x, num_intervals);
 }
 
@@ -60,20 +60,20 @@ void Characterize2DSurface::calculate_arc_length(double start, double end, doubl
 //
 //
 // Method to compute the second derivatives at the center (origin)
-void Characterize2DSurface::firstDerivatives(double x, double y, double& fx, double& fy) {
+void CharactDoublySurface::firstDerivatives(double x, double y, double& fx, double& fy) {
     fx = 2 * c1 * x + c2;
     fy = 2 * c4 * y + c3;
 }
 
 // Method to compute second derivatives (constant for this surface)
-void Characterize2DSurface::secondDerivatives(double& fxx, double& fyy, double& fxy) {
+void CharactDoublySurface::secondDerivatives(double& fxx, double& fyy, double& fxy) {
     fxx = 2 * c1;
     fyy = 2 * c4;
     fxy = 0; // The cross derivative is zero for this surface
 }
 
 // Method to compute the radii and principal curvature lengths
-void Characterize2DSurface::computeRadii(double x, double y, double& R1, double& R2) {
+void CharactDoublySurface::computeRadii(double x, double y, double& R1, double& R2) {
     double fx, fy, fxx, fyy, fxy;
     firstDerivatives(x, y, fx, fy);
     secondDerivatives(fxx, fyy, fxy);
@@ -85,7 +85,7 @@ void Characterize2DSurface::computeRadii(double x, double y, double& R1, double&
 
 
 // Definition of the static method calculateCentralAngle
-double Characterize2DSurface::calculateCentralAngle(double curveLength, double radius) {
+double CharactDoublySurface::calculateCentralAngle(double curveLength, double radius) {
     double angleInRadians = curveLength / radius;
     double angleInDegrees = angleInRadians * (180.0 / M_PI);
     return angleInDegrees;
