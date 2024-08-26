@@ -1,5 +1,6 @@
 #include "ReadParseData.h"
 #include "characterize2DSurface.h"
+#include "CharacterizeAsymmetricSurface.h"
 #include "FittingAlgorithms.h"
 #include <iostream>
 #include <iomanip>
@@ -46,26 +47,19 @@ int main() {
 		//<< doublyCurvedCoeffs(5) << " * y^2 " << std::endl;
     std::cout << "\n\n";
 	std::cout << "1) Fitting doubly curved shell (elliptic paraboloid) using a NEW approach:" << std::endl;
-    std::cout << "Fitting Algorithms: " << std::endl;
     std::cout << "--------------------------------------------" << std::endl;
+    std::cout << "Fitting Algorithms: " << std::endl;
     Eigen::VectorXd coefficients = fittingAlgorithms.fitDoublyCurvedShell2();
     std::cout << "Fitted equation: z = " << coefficients(0) << " * x^2 + " << coefficients(1) 
               << " * x + " << coefficients(2) << " * y + " << coefficients(3) << " * y^2" << std::endl;
     std::cout << "Characterize Fitted 2D Surface: " << std::endl;
-    std::cout << "--------------------------------------------" << std::endl;
     Characterize2DSurface surface(coefficients(0), coefficients(1), coefficients(2), coefficients(3));
     const auto& center = readParseData.getCenterCoordinates();
     double R1X, R2Y, L1X, L2Y;
     // For fixed y, varying x
-    double y_fixed = center.centerY;
-    double x_start = ranges.x.min;
-    double x_end = ranges.x.max;
-    surface.calculate_arc_length(x_start, x_end, y_fixed, true, L1X);
+    surface.calculate_arc_length(ranges.x.min, ranges.x.max, center.centerY, true, L1X);
     // For fixed x, varying y
-    double x_fixed = center.centerX;
-    double y_start = ranges.y.min;
-    double y_end = ranges.y.max;
-    surface.calculate_arc_length(y_start, y_end, x_fixed, false, L2Y);
+    surface.calculate_arc_length(ranges.y.min, ranges.y.max, center.centerX, false, L2Y);
     surface.computeRadii(center.centerX, center.centerY, R1X, R2Y);
     std::cout << "Principal Radius of Curvature R1: " << R1X << std::endl;
     std::cout << "Principal Radius of Curvature R2: " << R2Y << std::endl;
@@ -79,13 +73,19 @@ int main() {
 
     std::cout << "\n\n";
     std::cout << "2) Fitting singly curved shell (cylindrical paraboloid) using a NEW approach:" << std::endl;
+    std::cout << "--------------------------------------------" << std::endl;
     Eigen::VectorXd coefitSinglyCurvedShell2X = fittingAlgorithms.fitSinglyCurvedShell(Axis::X);
     std::cout << "Fitted equation along X-axis: z = " << coefitSinglyCurvedShell2X(0) << " * x^2 + " << coefitSinglyCurvedShell2X(1) << " * y" << std::endl;
     Eigen::VectorXd coefitSinglyCurvedShell2Y = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
     std::cout << "Fitted equation along Y-axis: z = " << coefitSinglyCurvedShell2Y(0) << " * y^2 + " << coefitSinglyCurvedShell2Y(1) << " * x" << std::endl;
+    CharacterizeAsymmetricSurface surface2(coefitSinglyCurvedShell2Y(0), coefitSinglyCurvedShell2Y(1));
+    double arc_length_y;
+    surface2.calculate_arc_length(ranges.y.min, ranges.y.max, center.centerX, false, arc_length_y); // Along Y-axis
+    std::cout << "Principal Curvature Length L2: " << arc_length_y << std::endl;
 
     std::cout << "\n\n";
     std::cout << "3) Fitting flat panel surface:" << std::endl;
+    std::cout << "--------------------------------------------" << std::endl;
     Eigen::VectorXd flatPanelCoeffs = fittingAlgorithms.fitFlatPanel();
     std::cout << "Panel equation: z = " << flatPanelCoeffs(0) << " + " << flatPanelCoeffs(1) << " * x + "
         << flatPanelCoeffs(2) << " * y " << std::endl;
