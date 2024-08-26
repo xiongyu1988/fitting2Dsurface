@@ -1,6 +1,6 @@
 #include "ReadParseData.h"
-#include "characterize2DSurface.h"
-#include "CharacterizeAsymmetricSurface.h"
+#include "CharactDoublySurface.h"
+#include "CharactSinglySurface.h"
 #include "FittingAlgorithms.h"
 #include <iostream>
 #include <iomanip>
@@ -38,8 +38,6 @@ int main() {
     const auto& ranges = readParseData.getCoordinateRanges();
     readParseData.calculateCenterCoordantes();
 
-
-
   //  std::cout << "\nFitting doubly curved shell (elliptic paraboloid):" << std::endl;
   //  Eigen::VectorXd doublyCurvedCoeffs = fittingAlgorithms.fitDoublyCurvedShell();
   //  std::cout << "Shell equation: z = " << doublyCurvedCoeffs(0) << " + " << doublyCurvedCoeffs(1) << " * x + "
@@ -53,7 +51,7 @@ int main() {
     std::cout << "Fitted equation: z = " << coefficients(0) << " * x^2 + " << coefficients(1) 
               << " * x + " << coefficients(2) << " * y + " << coefficients(3) << " * y^2" << std::endl;
     std::cout << "Characterize Fitted 2D Surface: " << std::endl;
-    Characterize2DSurface surface(coefficients(0), coefficients(1), coefficients(2), coefficients(3));
+    CharactDoublySurface surface(coefficients(0), coefficients(1), coefficients(2), coefficients(3));
     const auto& center = readParseData.getCenterCoordinates();
     double R1X, R2Y, L1X, L2Y;
     // For fixed y, varying x
@@ -66,8 +64,8 @@ int main() {
     std::cout << "Principal Curvature Length L1: " << L1X << std::endl;
     std::cout << "Principal Curvature Length L2: " << L2Y << std::endl;
     double centerAngle1, centerAngle2;
-    centerAngle1 = Characterize2DSurface::calculateCentralAngle(L1X, R1X);
-    centerAngle2 = Characterize2DSurface::calculateCentralAngle(L2Y, R2Y);
+    centerAngle1 = CharactDoublySurface::calculateCentralAngle(L1X, R1X);
+    centerAngle2 = CharactDoublySurface::calculateCentralAngle(L2Y, R2Y);
     std::cout << "Central Angle 1: " << centerAngle1 << std::endl;
     std::cout << "Central Angle 2: " << centerAngle2 << std::endl;
 
@@ -78,10 +76,15 @@ int main() {
     std::cout << "Fitted equation along X-axis: z = " << coefitSinglyCurvedShell2X(0) << " * x^2 + " << coefitSinglyCurvedShell2X(1) << " * y" << std::endl;
     Eigen::VectorXd coefitSinglyCurvedShell2Y = fittingAlgorithms.fitSinglyCurvedShell(Axis::Y);
     std::cout << "Fitted equation along Y-axis: z = " << coefitSinglyCurvedShell2Y(0) << " * y^2 + " << coefitSinglyCurvedShell2Y(1) << " * x" << std::endl;
-    CharacterizeAsymmetricSurface surface2(coefitSinglyCurvedShell2Y(0), coefitSinglyCurvedShell2Y(1));
+    CharactSinglySurface surface2(coefitSinglyCurvedShell2Y(0), coefitSinglyCurvedShell2Y(1));
     double arc_length_y;
     surface2.calculate_arc_length(ranges.y.min, ranges.y.max, center.centerX, false, arc_length_y); // Along Y-axis
+    double R_x, R_y;
+    surface2.computeRadius(center.centerY, R_y, false);
+    std::cout << "Radius of Curvature along Y: " << R_y << std::endl;
     std::cout << "Principal Curvature Length L2: " << arc_length_y << std::endl;
+	double centerAngleY = surface2.calculateCentralAngle(arc_length_y, R_y);
+	std::cout << "Central Angle: " << centerAngleY << std::endl;
 
     std::cout << "\n\n";
     std::cout << "3) Fitting flat panel surface:" << std::endl;

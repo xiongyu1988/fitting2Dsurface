@@ -1,11 +1,11 @@
-#ifndef CHARACTERIZE2DSURFACE_H
-#define CHARACTERIZE2DSURFACE_H
+#ifndef CHARACTDOUBLYSURFACE_H
+#define CHARACTDOUBLYSURFACE_H
 
 #include <iostream>
 #include <cmath>
 #include <limits>
 
-class Characterize2DSurface {
+class CharactDoublySurface {
 private:
     double c1, c2, c3, c4; // Coefficients for the surface equation
 
@@ -18,7 +18,7 @@ private:
 
 public:
     // Constructor
-    Characterize2DSurface(double c1, double c2, double c3, double c4);
+    CharactDoublySurface(double c1, double c2, double c3, double c4);
 
     // Public methods
     void calculate_arc_length(double start, double end, double fixed, bool along_x, double& arc_length, int num_intervals = 1000) const;
@@ -36,4 +36,4 @@ public:
     static double calculateCentralAngle(double curveLength, double radius);
 };
 
-#endif // CHARACTERIZE2D2DSURFACE_H
+#endif // CHRACTDOUBLYSURFACE_H
