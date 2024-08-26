@@ -51,7 +51,7 @@ int main() {
     std::cout << "Fitted equation: z = " << coefficients(0) << " * x^2 + " << coefficients(1) 
               << " * x + " << coefficients(2) << " * y + " << coefficients(3) << " * y^2" << std::endl;
     std::cout << "Characterize Fitted 2D Surface: " << std::endl;
-    CharactDoublyCurved2DSurface surface(coefficients(0), coefficients(1), coefficients(2), coefficients(3));
+    CharactDoublySurface surface(coefficients(0), coefficients(1), coefficients(2), coefficients(3));
     const auto& center = readParseData.getCenterCoordinates();
     double R1X, R2Y, L1X, L2Y;
     // For fixed y, varying x
